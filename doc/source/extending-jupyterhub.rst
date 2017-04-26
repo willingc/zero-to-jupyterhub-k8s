@@ -1,38 +1,53 @@
 Extending your JupyterHub setup
 ===============================
 
-The helm chart used to install JupyterHub has a lot of options for you to tweak. This page lists some of the most common changes.
+The helm chart used to install JupyterHub has a lot of options for you to tweak.
+This page lists some of the most common changes.
 
 Applying configuration changes
 ------------------------------
 
-The general method is:
+The general method for making and applying a configuration change is:
 
-1. Make a change to the ``config.yaml``
+1. Make a change to the ``config.yaml``.
 2. Run a helm upgrade::
 
-     .. code-block:: bash
+   .. code-block:: bash
 
-        helm upgrade <YOUR_RELEASE_NAME> https://github.com/jupyterhub/helm-chart/releases/download/v0.1/jupyterhub-0.1.tgz -f config.yaml
+      helm upgrade <YOUR_RELEASE_NAME> https://github.com/jupyterhub/helm-chart/releases/download/v0.1/jupyterhub-0.1.tgz -f config.yaml
 
-   Where ``<YOUR_RELEASE_NAME>`` is the parameter you passed to ``--name`` when `installing jupyterhub <setup-jupyterhub.html#install-jupyterhub>`_ with
-   ``helm install``. If you don't remember it, you can probably find it by doing ``helm list``
-3. Wait for the upgrade to finish, and make sure that when you do ``kubectl --namespace=<YOUR_NAMESPACE> get pod`` the hub and proxy pods are in ``Ready`` state. Your configuration change has been applied!
+   where ``<YOUR_RELEASE_NAME>`` is the parameter you passed to ``--name`` when
+   `installing jupyterhub <setup-jupyterhub.html#install-jupyterhub>`_ with
+   ``helm install``. If you don't remember it, you can probably find it by
+   running the ``helm list`` command.
+
+3. Wait for the upgrade to finish.
+
+4. Make sure that when you do ``kubectl --namespace=<YOUR_NAMESPACE> get pod``
+   the hub and proxy pods are in ``Ready`` state.
 
    .. note::
 
-   Currently, most config changes (except for changing with user image is used) require you to manually restart the hub pod. You can do this by finding the name of the pod with ``kubectl --namespace=<YOUR_NAMESPACE> get pod`` (it's the one that stats with hub-), and doing ``kubectl --namespace=<YOUR_NAMESPACE> delete pod <hub-pod-name>``. This will be fixed soon!
+   Currently, most config changes (except for changing which user image is used)
+   require you to manually restart the hub pod. You can do this by finding the
+   name of the pod with ``kubectl --namespace=<YOUR_NAMESPACE> get pod`` (it's
+   the one pod that starts with hub-), and doing
+   ``kubectl --namespace=<YOUR_NAMESPACE> delete pod <hub-pod-name>``.
+   **This will be fixed soon!**
 
+5. Your configuration change has been applied!
 
 Using an existing image
 -----------------------
 
-It's possible to build your jupyterhub deployment off of a pre-existing Docker image.
-To do this, you need to find an existing image somewhere (such as DockerHub), and configure
-your installation to use it.
+It's possible to build your jupyterhub deployment off of a pre-existing Docker
+image. To do this, you need to find an existing image somewhere (such as
+DockerHub), and configure your installation to use it.
 
-For example, UC Berkeley's `Data8 Program <https://hub.docker.com/r/berkeleydsep/singleuser-data8>`_ publishes the image they are using on Dockerhub.
-To instruct JupyterHub to use this image, simply add this to your ``config.yaml`` file:
+For example, UC Berkeley's `Data8 Program
+<https://hub.docker.com/r/berkeleydsep/singleuser-data8>`_ publishes the image
+they are using on Dockerhub. To instruct JupyterHub to use this image, simply
+add the image name and tag to your ``config.yaml`` file:
 
     .. code-block:: yaml
 
@@ -42,22 +57,25 @@ To instruct JupyterHub to use this image, simply add this to your ``config.yaml`
               tag: v0.1
 
 
-You can then `apply the change <#applying-configuration-changes>`_ to the config as usual.
+You can then `apply the change <#applying-configuration-changes>`_ to the
+config as described above.
 
 Extending your software stack with s2i
 --------------------------------------
 
-s2i, also known as `Source to Image <https://github.com/openshift/source-to-image>`_, lets you
-quickly convert a GitHub repository into a Docker image that we can use as a
-base for your JupyterHub instance. Anything inside the GitHub repository
-will exist in a user’s environment when they join your JupyterHub. If you
-include a ``requirements.txt`` file in the root level of your of the repository,
-s2i will ``pip install`` each of these packages into the Docker image to be
-built. Below we’ll cover how to use s2i to generate a Docker image and how to
-configure JupyterHub to build off of this image.
+s2i, also known as `Source to Image
+<https://github.com/openshift/source-to-image>`_, lets you quickly convert a
+GitHub repository into a Docker image that we can use as a base for your
+JupyterHub instance. Anything inside the GitHub repository will exist in a
+user’s environment when they join your JupyterHub. If you include a
+``requirements.txt`` file in the root level of your of the repository, s2i will
+``pip install`` each of these packages into the Docker image to be built. Below
+we’ll cover how to use s2i to generate a Docker image and how to configure
+JupyterHub to build off of this image.
 
 .. note::
-       For this section, you’ll need to install s2i and docker.
+
+   For this section, you’ll need to install s2i and docker.
 
 
 1. **Download s2i.** This is easily done with homebrew on a mac. For linux and
@@ -95,19 +113,23 @@ configure JupyterHub to build off of this image.
    using `<this template>` and call the image `<this>`*
 
   .. note::
-         - The project name should match your google cloud project's name.
+         - The project name should match your Google Cloud project's name.
          - Don’t use underscores in your image name. Other than this it can be
-           anything memorable. This is a bug that will be fixed soon.
+           anything memorable. *This is a bug that will be fixed soon.*
          - The tag should be the first 6 characters of the SHA in the GitHub
            commit for the image to build from.
 
-5. **Push our newly-built Docker image to the cloud.** You can either push this
+5. **Push the newly-built Docker image to the cloud.** You can either push this
    to Docker Hub, or to the gcloud docker repository. Here we’ll push to the
-   gcloud repository::
+   gcloud repository:
 
-       gcloud docker -- push gcr.io/<project-name>/<image-name>:<tag>
+   .. code-block:: bash
 
-6.  **Edit the JupyterHub configuration to build from this image.** We do this by editing the ``config.yaml`` file that we originally created to include the jupyter hashes. Edit ``config.yaml`` by including these lines in it:
+      gcloud docker -- push gcr.io/<project-name>/<image-name>:<tag>
+
+6. **Edit the JupyterHub configuration to build from this image.** We do this
+   by editing the ``config.yaml`` file that we originally created to include
+   the jupyter hashes. Edit ``config.yaml`` by including these lines in it:
 
     .. code-block:: bash
 
@@ -116,41 +138,56 @@ configure JupyterHub to build off of this image.
               name: gcr.io/<project-name>/<image-name>
              tag: <tag>
 
-7. **Tell helm to update JupyterHub to use this configuration.** Using the normal method to `apply the change <#applying-configuration-changes>`_ to the config.
-8. **Restart your notebook if you are already logging in** If you already have a running JupyterHub session, you’ll need to restart it (by stopping and starting your session from the control panel in the top right). New users won’t have to do this.
-9. **Enjoy your new computing environment!** You should now have a live computing environment built off of the Docker image we’ve created.
+7. **Tell helm to update JupyterHub to use this configuration.** Using the
+   normal method to `apply the change <#applying-configuration-changes>`_ to
+   the config.
+
+8. **Restart your notebook if you are already logged in.** If you already have
+   a running JupyterHub session, you’ll need to restart it (by stopping and
+   starting your session from the control panel in the top right). New users
+   will not have to do this.
+
+9. **Enjoy your new computing environment!** You should now have a live
+   computing environment built off of the Docker image we’ve created.
 
 Authenticating with OAuth2
 --------------------------
 
-JupyterHub's `oauthenticator <https://github.com/jupyterhub/oauthenticator>`_ has support for enabling your users to authenticate via a third-party OAuth provider, including GitHub, Google, and CILogon.
+JupyterHub's `oauthenticator <https://github.com/jupyterhub/oauthenticator>`_
+has support for enabling your users to authenticate via a third-party OAuth
+provider, including GitHub, Google, and CILogon.
 
-Follow the service-specific instructions linked on the `oauthenticator repository <https://github.com/jupyterhub/oauthenticator>`_ to generate your JupyterHub instance's OAuth2 client ID and client secret. Then declare the values in the helm chart (``config.yaml``).
+Follow the service-specific instructions linked on the
+`oauthenticator repository <https://github.com/jupyterhub/oauthenticator>`_
+to generate your JupyterHub instance's OAuth2 client ID and client secret.
+Then declare the values in the helm chart (``config.yaml``).
 
-Here are example configurations for two common authentication services. Note that
-in each case, you need to get the authentication credential information before
-you can configure the helmchart for authentication.
+Here are example configurations for two common authentication services. Note
+that in each case, you need to get the authentication credential information
+before you can configure the helmchart for authentication.
 
-**Google**
-
-.. code-block:: bash
-
-    auth:
-      type: google
-      google:
-        clientId: "yourlongclientidstring.apps.googleusercontent.com"
-        clientSecret: "adifferentlongstring"
-        callbackUrl: "http://<your_jupyterhub_host>/hub/oauth_callback"
-        hostedDomain: "youruniversity.edu"
-        loginService: "Your University"
-
-**GitHub**
+Google
+~~~~~~
 
 .. code-block:: bash
 
-      auth:
-        type: github
-        github:
-          clientId: "y0urg1thubc1ient1d"
-          clientSecret: "an0ther1ongs3cretstr1ng"
-          callbackUrl: "http://<your_jupyterhub_host>/hub/oauth_callback"
+   auth:
+     type: google
+     google:
+       clientId: "yourlongclientidstring.apps.googleusercontent.com"
+       clientSecret: "adifferentlongstring"
+       callbackUrl: "http://<your_jupyterhub_host>/hub/oauth_callback"
+       hostedDomain: "youruniversity.edu"
+       loginService: "Your University"
+
+GitHub
+~~~~~~
+
+.. code-block:: bash
+
+   auth:
+     type: github
+     github:
+       clientId: "y0urg1thubc1ient1d"
+       clientSecret: "an0ther1ongs3cretstr1ng"
+       callbackUrl: "http://<your_jupyterhub_host>/hub/oauth_callback"
