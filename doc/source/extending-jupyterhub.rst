@@ -83,8 +83,7 @@ JupyterHub to build off of this image.
    links below:
 
        - On OSX: ``brew install s2i``
-       - On Linux and Windows: `follow these instructions
-         <https://github.com/openshift/source-to-image#installation>`_
+       - On Linux and Windows: `follow these instructions <https://github.com/openshift/source-to-image>`_
 
 2. **Download and start Docker.** You can do this by downloading and installing
    Docker at `this link <https://store.docker.com/search?offering=community&platform=desktop%2Cserver&q=&type=edition>`_.
