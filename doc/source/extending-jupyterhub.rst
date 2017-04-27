@@ -20,6 +20,10 @@ The general method is:
    ``helm install``. If you don't remember it, you can probably find it by doing ``helm list``
 3. Wait for the upgrade to finish, and make sure that when you do ``kubectl --namespace=<YOUR_NAMESPACE> get pod`` the hub and proxy pods are in ``Ready`` state. Your configuration change has been applied!
 
+   .. note::
+
+      Currently, most config changes (except for changing with user image is used) require you to manually restart the hub pod. You can do this by finding the name of the pod with ``kubectl --namespace=<YOUR_NAMESPACE> get pod`` (it's the one that stats with hub-), and doing ``kubectl --namespace=<YOUR_NAMESPACE> delete pod <hub-pod-name>``. This will be fixed soon!
+
 
 Using an existing image
 -----------------------
@@ -56,7 +60,7 @@ use more than 1G of RAM if these resources aren't being used by other users.
 
 A resource *limit* sets a hard limit on the resources available. In the example
 above, if there were a 1G memory limit, it would mean that users could use
-no more than 1G of RAM, no matter what other resources are being used on the 
+no more than 1G of RAM, no matter what other resources are being used on the
 machines.
 
 By default, each user is *guaranteed* 1G of RAM. All users have *at least*
@@ -78,7 +82,7 @@ the guarantee to allow some users to use larger amounts of RAM for
 a very short-term time (e.g. when running a single, short-lived function that
 consumes a lot of memory).
 
-.. note:: 
+.. note::
     Remember `apply the changes <#applying-configuraiton-changes>`_ after changing
     your config.yaml file!
 
