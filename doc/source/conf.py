@@ -43,12 +43,12 @@ source_parsers = {
 }
 
 # Generate JSON version of the helm-chart
-from ruamel.yaml import YAML
+import ruamel.yaml
 import json, sys
 import requests
 resp = requests.get('https://raw.githubusercontent.com/jupyterhub/helm-chart/master/jupyterhub/schema.yaml')
 yamlraw = resp.text
-yaml = YAML()
+yaml = ruamel.yaml.YAML()
 yamlstruct = yaml.load(yamlraw)
 with open('_static/schema.json', 'w') as ff:
     json.dump(yamlstruct, ff, sort_keys=True, indent=2)
