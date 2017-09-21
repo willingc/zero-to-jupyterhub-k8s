@@ -43,7 +43,6 @@ source_parsers = {
 }
 
 def setup(app):
-    app.add_stylesheet('custom.css')
     app.add_transform(AutoStructify)
 
 # The suffix(es) of source filenames.
@@ -149,7 +148,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'ZeroToJupyterhubDoc.tex', 'Zero to JupyterHub',
-     'Chris Holdgraf', 'manual'),
+     'Project Jupyter', 'manual'),
 ]
 
 
