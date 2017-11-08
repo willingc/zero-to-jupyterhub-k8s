@@ -5,10 +5,10 @@
 1. Create a file called `config.yaml`.
 2. Create two random hex strings to use as security tokens:
 
-  ```bash
-  openssl rand -hex 32
-  openssl rand -hex 32
-  ```
+    ```bash
+    openssl rand -hex 32
+    openssl rand -hex 32
+    ```
 3. Insert these lines into the `config.yaml` file.
    Substitute each occurrence of `RANDOM_STRING_N ` below with the output of
    `openssl rand -hex 32`.
