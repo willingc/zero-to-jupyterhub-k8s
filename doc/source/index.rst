@@ -65,6 +65,7 @@ production deployment of JupyterHub.
    glossary
    additional-resources
    cheat-k8s-cluster.md
+   cheat-setup-helm.md
    cheat-localdev.md
 
 **Institutional support**
