@@ -39,19 +39,7 @@
         --name=<YOUR-RELEASE-NAME> \
         --namespace=<YOUR-NAMESPACE> \
         -f config.yaml
-    ```
 
-    Notes:
-
-    - `--name` For a class called *data8* you might wish set the name to **data8-jupyterhub**. Find out the name by using `helm list`.
-    - `--namespace`  is to identify a particular application
-    - We recommend using the same value for `--name` and `--namespace`
-    - If you get a `release exists` error, then `helm delete --purge <YOUR-RELEASE-NAME>`. Reinstall by repeating this step. If it persists, `kubectl delete <YOUR-NAMESPACE>` and try again.
-    - If you get a time out error, add a `--timeout=SOME-LARGE-NUMBER` parameter to the `helm install` command.
-
-2. From terminal:
-
-    ```bash
     # check hub and proxy pods are running
     kubectl --namespace=<YOUR_NAMESPACE> get pod
 
@@ -60,7 +48,15 @@
     # alternative verbose command for IP
     # kubectl --namespace=<YOUR_NAMESPACE> describe svc proxy-public
     ```
-3. To use JupyterHub:
+2. To use JupyterHub:
     - enter external IP for the `proxy-public` service into a browser.
     - entering any username and password combination as JupyterHub is
       running with a default *dummy* authenticator
+
+### Notes
+
+- `--name` For a class called *data8* you might wish set the name to **data8-jupyterhub**. Find out the name by using `helm list`.
+- `--namespace`  is to identify a particular application
+- We recommend using the same value for `--name` and `--namespace`
+- If you get a `release exists` error, then `helm delete --purge <YOUR-RELEASE-NAME>`. Reinstall by repeating this step. If it persists, `kubectl delete <YOUR-NAMESPACE>` and try again.
+- If you get a time out error, add a `--timeout=SOME-LARGE-NUMBER` parameter to the `helm install` command.
