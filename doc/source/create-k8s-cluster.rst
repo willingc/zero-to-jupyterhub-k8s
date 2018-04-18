@@ -23,4 +23,7 @@ infrastructure:
      the `Kubernetes best-practices guide <http://blog.kubernetes.io/2016/08/security-best-practices-kubernetes-deployment.html>`_
      for information about keeping your Kubernetes infrastructure secure.
 
+   * Consult the `Kubernetes documentation section *Picking the Right Solution* <https://kubernetes.io/docs/setup/pick-right-solution/>`_
+     for other ways of setting up a Kubernetes cluster.
+
 .. _ways to set up a cluster: https://kubernetes.io/docs/setup/pick-right-solution/
