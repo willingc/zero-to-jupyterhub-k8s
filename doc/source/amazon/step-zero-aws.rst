@@ -220,7 +220,8 @@ After applying, this will encrypt any dynamic volumes
 (such as your notebook) created by Kubernetes, it will not encrypt
 the storage on the Kubernetes nodes themselves.
 
-**Encryption in Transit**
+Encryption in Transit
+^^^^^^^^^^^^^^^^^^^^^
 
 In step 9 above, set up the cluster with weave by including 
 the ``--networking weave`` flag in the ``kops create`` command above.
