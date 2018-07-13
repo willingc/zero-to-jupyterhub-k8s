@@ -7,8 +7,9 @@ AWS does not have native support for Kubernetes, however there are
 many organizations that have put together their own solutions and
 guides for setting up Kubernetes on AWS.
 
-This guide uses kops to setup a cluster on AWS.  This should be seen as a rough template you will use to
-setup and shape your cluster.
+This guide uses **kops** to setup a cluster on AWS.  This should be
+seen as a rough template which you will use to setup and shape your
+cluster.
 
 Procedure:
 
@@ -153,7 +154,9 @@ Procedure:
 
 13. Enable dynamic storage on your Kubernetes cluster.
     Create a file, ``storageclass.yml`` on your local computer, and enter
-    this text::
+    this text:
+
+    .. code-block:: yaml
 
         kind: StorageClass
         apiVersion: storage.k8s.io/v1
@@ -176,13 +179,19 @@ Procedure:
     disks, allowing us to automatically assign a disk per user when they log
     in to JupyterHub.
     
-**Encryption**
+Encryption
+~~~~~~~~~~
 
-There are simple methods for encrypting your Kubernetes cluster. Illustrated here are simple methods for encryption at rest and encryption in transit.
+There are simple methods for encrypting your Kubernetes cluster. Illustrated here
+are simple methods for encryption at rest and encryption in transit.
 
-**Encryption at Rest**
+Encryption at Rest
+^^^^^^^^^^^^^^^^^^
 
-Instead of performing step 13 above. Create the following ``storageclass.yml`` file on your local computer::
+Instead of performing step 13 above, create the following ``storageclass.yml``
+file on your local computer:
+
+.. code-block:: yaml
 
         kind: StorageClass
         apiVersion: storage.k8s.io/v1
@@ -195,21 +204,26 @@ Instead of performing step 13 above. Create the following ``storageclass.yml`` f
           type: gp2
           encrypted: "true"
 
-The main difference is the addition of the line `encrypted: "true"` and make note that `true` is in double quotes.
+The main difference is the addition of the line ``encrypted: "true"`` 
+and make note that ``true`` is in double quotes.
 
 Next run these commands:
        
-        .. code-block:: bash
+.. code-block:: bash
            
-           kubectl delete storageclass gp2
-           kubectl apply -f storageclass.yml
+   kubectl delete storageclass gp2
+   kubectl apply -f storageclass.yml
 
-Kubernetes will not allow you to modify storageclass gp2 in order to add the `encrypted` flag so you will have to delete it first.
-This will encrypt any dynamic volumes (such as your notebook)created by Kubernetes, it will not encrypt the storage on the Kubernetes nodes themselves.
+Kubernetes will not allow you to modify ``storageclass gp2`` in order
+to add the ``encrypted`` flag so you will have to delete it first.
+After applying, this will encrypt any dynamic volumes 
+(such as your notebook) created by Kubernetes, it will not encrypt
+the storage on the Kubernetes nodes themselves.
 
 **Encryption in Transit**
 
-In step 9 above, set up the cluster with weave by including the `--networking weave` flag in the `kops create` command above.
+In step 9 above, set up the cluster with weave by including 
+the ``--networking weave`` flag in the ``kops create`` command above.
 Then perform the following steps:
 
 1. Verify weave is running:
@@ -218,16 +232,19 @@ Then perform the following steps:
             
       kubectl --namespace kube-system get pods
 
-   You should see several pods of the form `weave-net-abcde`
+   You should see several pods of the form ``weave-net-abcde``.
 
-2.  Create Kubernetes secret with a private password of sufficient strength. A random 128 bytes is used in this example:
+2. Create a **Kubernetes secret** with a private password of
+   sufficient strength. A random 128 bytes is used in this example:
 
-    .. code-block:: bash
+   .. code-block:: bash
            
-        openssl rand -hex 128 >weave-passwd
-        kubectl create secret -n kube-system generic weave-passwd --from-file=./weave-passwd
+      openssl rand -hex 128 >weave-passwd
+      kubectl create secret -n kube-system generic weave-passwd --from-file=./weave-passwd
 
-    It is important that the secret name and its value (taken from the filename) are the same. If they do not match you may get a `ConfigError`
+   It is important that the secret name and its value
+   (taken from the filename) are the same. If they do not
+   match you may get a ``ConfigError``.
 
 3. Patch Weave with the password:
 
@@ -240,19 +257,22 @@ Then perform the following steps:
 
     .. code-block:: bash
            
-        kubectl patch --namespace=kube-system daemonset/weave-net --type json -p '[ { "op": "remove", "path": "/spec/template/spec/containers/0/env/0"} ]'
+       kubectl patch --namespace=kube-system daemonset/weave-net --type json -p '[ { "op": "remove", "path": "/spec/template/spec/containers/0/env/0"} ]'
     
-4. Check to see that the pods are restarted. To expedite the process you can delete the old pods.
+4. Check to see that the pods are restarted. To expedite the process
+   you can delete the old pods.
 
 5. You can verify encryption is turned on with the following command:
 
-    .. code-block:: bash
+   .. code-block:: bash
     
-        kubectl exec -n kube-system weave-net-<pod> -c weave -- /home/weave/weave --local status
+      kubectl exec -n kube-system weave-net-<pod> -c weave -- /home/weave/weave --local status
 
-    You should see `encryption: enabled`
+   You should see `encryption: enabled`
     
-    If you really want to insure encryption is working, you can listen on port `6783` of any node. If the traffic looks like gibberish, you know it is on.
+   If you really want to insure encryption is working, you can listen on
+   port ``6783`` of any node. If the traffic looks like gibberish,
+   you know it is on.
 
     
 Congrats. Now that you have your Kubernetes cluster running, it's time to
