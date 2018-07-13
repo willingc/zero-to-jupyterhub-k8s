@@ -4,7 +4,7 @@ Step Zero: Amazon Web Services (AWS) - Elastic Container with Kubernetes (EKS)
 ------------------------------------------------------------------------------
 
 AWS recently released native support for Kubernetes with its
-[EKS](https://aws.amazon.com/eks/) offering. 
+`EKS <https://aws.amazon.com/eks/>`_ offering. 
 
 .. note::
 
